@@ -17,7 +17,7 @@ import java.util.UUID;
 public class BookController {
   private final BookService bookService;
 
-  @GetMapping("/${id}")
+  @GetMapping("/{id}")
   public Collection<Comment> getBookComments(@PathVariable("id") UUID id) {
     return bookService.getBookComments(id);
   }
@@ -27,12 +27,12 @@ public class BookController {
     return new ResponseEntity<>(bookService.addNew(book), HttpStatus.CREATED);
   }
 
-  @PutMapping("/${id}")
+  @PutMapping("/{id}")
   public Book updateBook(@RequestBody Book book, @PathVariable("id") UUID id) {
     return bookService.update(book, id);
   }
 
-  @DeleteMapping("/${id}")
+  @DeleteMapping("/{id}")
   public ResponseEntity<HttpStatus> updateBook(@PathVariable("id") UUID id) {
     bookService.remove(id);
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
