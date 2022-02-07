@@ -1,6 +1,7 @@
 package com.cloud_steam.bookstore.models;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -14,6 +15,7 @@ import java.util.UUID;
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
 public class Book {
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(
@@ -25,4 +27,9 @@ public class Book {
     private String name;
     @OneToMany
     private Set<Comment> comments;
+
+    public Book(String name, Set<Comment> comments) {
+        this.name = name;
+        this.comments = comments;
+    }
 }
