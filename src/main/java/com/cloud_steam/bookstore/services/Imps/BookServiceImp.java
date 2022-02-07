@@ -1,6 +1,7 @@
 package com.cloud_steam.bookstore.services.Imps;
 
 import com.cloud_steam.bookstore.models.Book;
+import com.cloud_steam.bookstore.models.Comment;
 import com.cloud_steam.bookstore.repositories.BookRepository;
 import com.cloud_steam.bookstore.services.BookService;
 import lombok.RequiredArgsConstructor;
@@ -26,9 +27,14 @@ public class BookServiceImp implements BookService {
   }
 
   @Override
+  public Collection<Comment> getBookComments(UUID id) {
+    Book currentBook = getBookFromRepo(id);
+    return currentBook.getComments();
+  }
+
+  @Override
   public Book update(Book book, UUID id) {
-    Book currentBook = bookRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Book id not found"));
+    Book currentBook = getBookFromRepo(id);
     currentBook.setName(book.getName());
     currentBook.setComments(book.getComments());
     return bookRepository.save(book);
@@ -36,7 +42,13 @@ public class BookServiceImp implements BookService {
 
   @Override
   public void remove(UUID id) {
-    if (bookRepository.existsById(id)) throw new IllegalArgumentException("Book id not found");
-    bookRepository.deleteById(id);
+    if (getBookFromRepo(id)!=null)
+      bookRepository.deleteById(id);
+  }
+
+  private Book getBookFromRepo(UUID id) {
+    return bookRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Book id not found"));
+
   }
 }
