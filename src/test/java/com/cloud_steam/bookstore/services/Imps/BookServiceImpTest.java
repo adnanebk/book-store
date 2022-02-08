@@ -26,7 +26,7 @@ class BookServiceImpTest {
     private  BookServiceImp bookService;
     @Test
     void addNewBook_Success() {
-        var book = new Book("prgramming in java",
+        var book = new Book("programming in java",
                 Set.of(new Comment("comment 1"),new Comment("comment 2"),new Comment("comment 3")));
         when(bookRepository.save(any(Book.class))).thenReturn(book);
         var savedBook = bookService.addNew(book);
@@ -44,8 +44,7 @@ class BookServiceImpTest {
     @Test
     void getBookComments_Success() {
         UUID id = UUID.randomUUID();
-        var book = new Book("a book",Set.of(new Comment()));
-        when(bookRepository.findById(id)).thenReturn(Optional.of(book));
+        var book = createNewBook(id);
         var bookComments = bookService.getBookComments(id);
         assertThat(bookComments).hasSize(1);
     }
@@ -57,15 +56,13 @@ class BookServiceImpTest {
     @Test
     void updateBook_Success() {
         UUID id = UUID.randomUUID();
-        var book = new Book("a book",Set.of(new Comment()));
-        book.setId(id);
-        when(bookRepository.findById(id)).thenReturn(Optional.of(book));
+        Book book = createNewBook(id);
         when(bookRepository.save(any(Book.class))).thenReturn(book);
         var updatedBook = bookService.update(book,id);
         assertThat(updatedBook).isNotNull();
         assertThat(updatedBook.getId()).isEqualTo(id);
-
     }
+
     @Test
     void updateBook_failed() {
         UUID id = UUID.randomUUID();
@@ -83,5 +80,12 @@ class BookServiceImpTest {
     void remove_failed() {
         UUID id = UUID.randomUUID();
         assertThatIllegalArgumentException().isThrownBy(()->bookService.remove(id));
+    }
+
+    private Book createNewBook(UUID id) {
+        var book = new Book("a book",Set.of(new Comment()));
+        book.setId(id);
+        when(bookRepository.findById(id)).thenReturn(Optional.of(book));
+        return book;
     }
 }
