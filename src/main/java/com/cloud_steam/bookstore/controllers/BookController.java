@@ -17,7 +17,7 @@ import java.util.UUID;
 public class BookController {
   private final BookService bookService;
 
-  @GetMapping("/{id}")
+  @GetMapping("/{id}/comments")
   public Collection<Comment> getBookComments(@PathVariable("id") UUID id) {
     return bookService.getBookComments(id);
   }
