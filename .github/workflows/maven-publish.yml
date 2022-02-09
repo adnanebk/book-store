@@ -30,11 +30,10 @@ jobs:
     - name: Build & push Docker image
       uses: mr-smithers-excellent/docker-build-push@v5
       with:
-       image: adnanebk/discord-activity-badge:latest
-       push: true
-       tags: adnanebk/discord-activity-badge:latest
-       dockerfile: Dockerfile
-       registry: docker.io
-       tag_with_ref: true        
-       username: ${{ secrets.DOCKER_USERNAME }}
-       password: ${{ secrets.DOCKER_PASSWORD }}
+        image: adnanebk/bookstore_spring-boot
+        push: true
+        tags: latest
+        registry: docker.io
+        dockerfile: Dockerfile
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
