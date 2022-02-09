@@ -62,19 +62,19 @@ class BookControllerTest {
     @Test
     void testGetBookComments() throws Exception {
         UUID id = UUID.randomUUID();
-        String api = createApi(id,"comments");
-        mockMvc.perform(get(api)).andExpect(status().isOk());
+        mockMvc.perform(get(ROOT+"/"+id+"/comments")).andExpect(status().isOk());
     }
 
     @Test
     void testAddBook() throws Exception {
         var book = createNewBook();
         when(bookMapper.toEntity(any(BookDto.class))).thenReturn(book);
-
         when(bookService.addNew(any(Book.class))).thenReturn(book);
+
         var bookAsJson = jsonBook.write(book).getJson();
         var response=mockMvc.perform(post(ROOT).contentType(MediaType.APPLICATION_JSON).content(bookAsJson))
                 .andExpect(status().isCreated()).andReturn().getResponse();
+
         assertThat(response.getContentAsString()).isEqualTo(bookAsJson);
     }
 
@@ -83,32 +83,28 @@ class BookControllerTest {
         UUID id=UUID.randomUUID();
         var book = createNewBook();
         when(bookMapper.toEntity(any(BookDto.class))).thenReturn(book);
-        book.setId(id);
-        var api = createApi(id);
         when(bookService.update(any(Book.class),any())).thenReturn(book);
         var bookAsJson = jsonBook.write(book).getJson();
-        var response=mockMvc.perform(put(api).contentType(MediaType.APPLICATION_JSON).content(bookAsJson))
-                .andExpect(status().isOk()).andReturn().getResponse();
+
+    var response = mockMvc
+            .perform(put(ROOT+"/"+id,ROOT,id).contentType(MediaType.APPLICATION_JSON).content(bookAsJson))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse();
+
         assertThat(response.getContentAsString()).isEqualTo(bookAsJson);
     }
 
     @Test
     void testDeleteBook_success() throws Exception {
         UUID id=UUID.randomUUID();
-        var api = createApi(id);
         doNothing().when(bookService).remove(any());
-        mockMvc.perform(delete(api)).andExpect(status().isNoContent());
+        mockMvc.perform(delete(ROOT+"/"+id)).andExpect(status().isNoContent());
     }
 
     private Book createNewBook() {
         return new Book("a book",new HashSet<>());
     }
-    private <T> String createApi(T... paths){
-        String api=ROOT;
-        for (T path : paths)
-            api+="/"+path;
 
-        return  api;
-    }
 
 }
