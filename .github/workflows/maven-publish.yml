@@ -29,8 +29,10 @@ jobs:
         distribution: 'temurin'
         server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
         settings-path: ${{ github.workspace }} # location for the settings.xml file
-    - name: Build with Maven
-      run: mvn clean package -Dmaven.test.skip=true
+    - name: Maven Package
+      run: mvn -B clean package -DskipTests
+    - name: Maven Verify
+      run: mvn -B clean verify
 
     - name: Publish to Docker Hub
       uses: docker/build-push-action@v2
