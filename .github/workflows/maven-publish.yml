@@ -30,9 +30,9 @@ jobs:
     - name: Build & push Docker image
       uses: mr-smithers-excellent/docker-build-push@v5
       with:
-       image: codexlink/discord-activity-badge:latest
+       image: adnanebk/discord-activity-badge:latest
        push: true
-       tags: codexlink/discord-activity-badge:latest
+       tags: adnanebk/discord-activity-badge:latest
        dockerfile: Dockerfile
        registry: docker.io
        tag_with_ref: true        
