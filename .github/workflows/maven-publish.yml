@@ -30,7 +30,7 @@ jobs:
     - name: Build & push Docker image
       uses: mr-smithers-excellent/docker-build-push@v5
       with:
-        repository: adnanebk/bookstore_springboot
+        image: adnanebk/bookstore_springboot
         dockerfile: Dockerfile
         tag_with_ref: true        
         push: true
