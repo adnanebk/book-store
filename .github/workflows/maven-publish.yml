@@ -37,9 +37,8 @@ jobs:
     - name: Publish to Docker Hub
       uses: mr-smithers-excellent/docker-build-push@v5
       with:
-        image: repo/image
+        image: adnanebk/bookstore_springboot
         tags: v1, latest
-        registry: registry-url.io
-        dockerfile: Dockerfile.ci
+        registry: docker.io
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
