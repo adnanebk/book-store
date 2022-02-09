@@ -7,10 +7,11 @@ import com.cloud_steam.bookstore.models.Comment;
 import com.cloud_steam.bookstore.services.BookService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -18,7 +19,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BookController {
   private final BookService bookService;
- private final BookMapper bookMapper;
+  private final BookMapper bookMapper;
 
   @GetMapping("/{id}/comments")
   public Collection<Comment> getBookComments(@PathVariable("id") UUID id) {
@@ -26,20 +27,27 @@ public class BookController {
   }
 
   @PostMapping
-  public ResponseEntity<Book> addBook(@RequestBody BookDto bookDto) {
-    var book = bookMapper.toEntity(bookDto);
-    return new ResponseEntity<>(bookService.addNew(book), HttpStatus.CREATED);
+  @ResponseStatus(HttpStatus.CREATED)
+  public Book addBook(@RequestBody Optional<BookDto> bookDto) {
+    return bookDto
+        .map(bookMapper::toEntity)
+        .map(bookService::addNew)
+        .orElseThrow(
+            () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "the book is empty"));
   }
 
   @PutMapping("/{id}")
-  public Book updateBook(@RequestBody BookDto bookDto, @PathVariable("id") UUID id) {
-    var book = bookMapper.toEntity(bookDto);
-    return bookService.update(book, id);
+  public Book updateBook(@RequestBody Optional<BookDto> bookDto, @PathVariable("id") UUID id) {
+    return bookDto
+        .map(bookMapper::toEntity)
+        .map(book -> bookService.update(book, id))
+        .orElseThrow(
+            () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "the book is empty"));
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<HttpStatus> removeBook(@PathVariable("id") UUID id) {
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void removeBook(@PathVariable("id") UUID id) {
     bookService.remove(id);
-    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
 }
