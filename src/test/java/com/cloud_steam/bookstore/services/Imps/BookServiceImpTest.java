@@ -1,5 +1,6 @@
 package com.cloud_steam.bookstore.services.Imps;
 
+import com.cloud_steam.bookstore.exceptions.BookNotFoundException;
 import com.cloud_steam.bookstore.models.Book;
 import com.cloud_steam.bookstore.models.Comment;
 import com.cloud_steam.bookstore.repositories.BookRepository;
@@ -51,7 +52,7 @@ class BookServiceImpTest {
     @Test
     void getBookComments_failed() {
         UUID id = UUID.randomUUID();
-        assertThatThrownBy(()->bookService.getBookComments(id)).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(()->bookService.getBookComments(id)).isInstanceOf(BookNotFoundException.class);
     }
     @Test
     void updateBook_Success() {
@@ -67,20 +68,15 @@ class BookServiceImpTest {
     void updateBook_failed() {
         UUID id = UUID.randomUUID();
         var book = new Book("a book",Set.of(new Comment()));
-        assertThatThrownBy(()->bookService.update(book,id)).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(()->bookService.update(book,id)).isInstanceOf(BookNotFoundException.class);
     }
 
     @Test
     void remove_successful() {
         UUID id = UUID.randomUUID();
-        when(bookRepository.findById(id)).thenReturn(Optional.of(new Book()));
         assertThatNoException().isThrownBy(()->bookService.remove(id));
     }
-    @Test
-    void remove_failed() {
-        UUID id = UUID.randomUUID();
-        assertThatIllegalArgumentException().isThrownBy(()->bookService.remove(id));
-    }
+
 
     private Book createNewBook(UUID id) {
         var book = new Book("a book",Set.of(new Comment()));
