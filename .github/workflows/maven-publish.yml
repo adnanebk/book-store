@@ -61,6 +61,14 @@ jobs:
       with:
         # Disabling shallow clone is recommended for improving relevancy of reporting
         fetch-depth: 0
+    - name: Set up JDK 17
+      uses: actions/setup-java@v2
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
+        settings-path: ${{ github.workspace }} # location for the settings.xml file
+        cache: maven
     - name: Analyze with SonarCloud
       run: mvn -B verify sonar:sonar -Dsonar.projectKey=adnane_Hands-on-ci-cd-for-springboot-apps -Dsonar.organization=adnane -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_TOKEN
       env:
