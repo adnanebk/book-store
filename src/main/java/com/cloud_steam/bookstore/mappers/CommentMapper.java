@@ -1,6 +1,6 @@
 package com.cloud_steam.bookstore.mappers;
 
-import com.cloud_steam.bookstore.Dto.CommentDto;
+import com.cloud_steam.bookstore.dto.CommentDto;
 import com.cloud_steam.bookstore.models.Comment;
 import org.mapstruct.Mapper;
 

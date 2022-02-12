@@ -1,4 +1,4 @@
-package com.cloud_steam.bookstore.services.Imps;
+package com.cloud_steam.bookstore.services.imps;
 
 import com.cloud_steam.bookstore.exceptions.BookNotFoundException;
 import com.cloud_steam.bookstore.models.Book;

@@ -1,4 +1,4 @@
-package com.cloud_steam.bookstore.Dto;
+package com.cloud_steam.bookstore.dto;
 
 import lombok.Getter;
 import lombok.Setter;
