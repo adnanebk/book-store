@@ -1,4 +1,4 @@
-package com.cloud_steam.bookstore.dto;
+package com.cloud_steam.bookstore.dtos;
 
 
 

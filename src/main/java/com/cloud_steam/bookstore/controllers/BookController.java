@@ -1,6 +1,6 @@
 package com.cloud_steam.bookstore.controllers;
 
-import com.cloud_steam.bookstore.dto.BookDto;
+import com.cloud_steam.bookstore.dtos.BookDto;
 import com.cloud_steam.bookstore.mappers.BookMapper;
 import com.cloud_steam.bookstore.models.Book;
 import com.cloud_steam.bookstore.models.Comment;
