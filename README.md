@@ -14,6 +14,6 @@ External libraries used are : H2 Db,Lombok,MapStruct
 
 unit test has been done for services,repositories,controllers
 
-continuous integration has been inegrated to automate docker build
+continuous integration has been inegrated to automate unit/integration tests and docker building
  
 
