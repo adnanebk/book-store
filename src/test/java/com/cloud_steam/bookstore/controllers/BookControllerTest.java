@@ -20,86 +20,88 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(BookController.class)
 @AutoConfigureJsonTesters
 @AutoConfigureMockMvc
 class BookControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-    @MockBean
-    private BookService bookService;
+  @Autowired private MockMvc mockMvc;
+  @MockBean private BookService bookService;
 
-    @MockBean
-    private BookMapper bookMapper;
+  @MockBean private BookMapper bookMapper;
 
-    @Autowired
-    private JacksonTester<Book> jsonBook;
+  @Autowired private JacksonTester<Book> jsonBook;
 
-    private static final String ROOT= "/api/books";
+  private static final String ROOT = "/api/books";
 
-    @BeforeEach
-    void setUp() {
-        var bookComments = Set.of(new Comment("comment 1"),new Comment("comment 2"),new Comment("comment 3"));
-        var book1 = new Book("programming in java",bookComments );
-        var book2 = new Book("getting started with docker",bookComments);
-        var books = Set.of(book1,book2);
-        when(bookService.getAll()).thenReturn(books);
-        when(bookService.getBookComments(any(UUID.class))).thenReturn(bookComments);
+  @BeforeEach
+  void setUp() {
+    var bookComments =
+        Set.of(new Comment("comment 1"), new Comment("comment 2"), new Comment("comment 3"));
+    var book1 = new Book("programming in java", bookComments);
+    var book2 = new Book("getting started with docker", bookComments);
+    var books = Set.of(book1, book2);
+    when(bookService.getAll()).thenReturn(books);
+    when(bookService.getBookComments(any(UUID.class))).thenReturn(bookComments);
+  }
 
-    }
+  @Test
+  void testGetBookComments() throws Exception {
+    UUID id = UUID.randomUUID();
+    mockMvc.perform(get(ROOT + "/" + id + "/comments")).andExpect(status().isOk());
+  }
 
-    @Test
-    void testGetBookComments() throws Exception {
-        UUID id = UUID.randomUUID();
-        mockMvc.perform(get(ROOT+"/"+id+"/comments")).andExpect(status().isOk());
-    }
+  @Test
+  void testAddBook() throws Exception {
+    var book = createNewBook();
+    when(bookMapper.toEntity(any(BookDto.class))).thenReturn(book);
+    when(bookService.addNew(any(Book.class))).thenReturn(book);
 
-    @Test
-    void testAddBook() throws Exception {
-        var book = createNewBook();
-        when(bookMapper.toEntity(any(BookDto.class))).thenReturn(book);
-        when(bookService.addNew(any(Book.class))).thenReturn(book);
+    var bookAsJson = jsonBook.write(book).getJson();
+    var response =
+        mockMvc
+            .perform(post(ROOT).contentType(MediaType.APPLICATION_JSON).content(bookAsJson))
+            .andExpect(status().isCreated())
+            .andReturn()
+            .getResponse();
 
-        var bookAsJson = jsonBook.write(book).getJson();
-        var response=mockMvc.perform(post(ROOT).contentType(MediaType.APPLICATION_JSON).content(bookAsJson))
-                .andExpect(status().isCreated()).andReturn().getResponse();
+    assertThat(response.getContentAsString()).isEqualTo(bookAsJson);
+  }
 
-        assertThat(response.getContentAsString()).isEqualTo(bookAsJson);
-    }
+  @Test
+  void testUpdateBook() throws Exception {
+    UUID id = UUID.randomUUID();
+    var book = createNewBook();
+    when(bookMapper.toEntity(any(BookDto.class))).thenReturn(book);
+    when(bookService.update(any(Book.class), any())).thenReturn(book);
+    var bookAsJson = jsonBook.write(book).getJson();
 
-    @Test
-    void testUpdateBook() throws Exception {
-        UUID id=UUID.randomUUID();
-        var book = createNewBook();
-        when(bookMapper.toEntity(any(BookDto.class))).thenReturn(book);
-        when(bookService.update(any(Book.class),any())).thenReturn(book);
-        var bookAsJson = jsonBook.write(book).getJson();
-
-    var response = mockMvc
-            .perform(put(ROOT+"/"+id,ROOT,id).contentType(MediaType.APPLICATION_JSON).content(bookAsJson))
+    var response =
+        mockMvc
+            .perform(
+                put(ROOT + "/" + id, ROOT, id)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(bookAsJson))
             .andExpect(status().isOk())
             .andReturn()
             .getResponse();
 
-        assertThat(response.getContentAsString()).isEqualTo(bookAsJson);
-    }
+    assertThat(response.getContentAsString()).isEqualTo(bookAsJson);
+  }
 
-    @Test
-    void testDeleteBook_success() throws Exception {
-        UUID id=UUID.randomUUID();
-        mockMvc.perform(delete(ROOT+"/"+id)).andExpect(status().isNoContent());
-    }
+  @Test
+  void testDeleteBook_success() throws Exception {
+    UUID id = UUID.randomUUID();
+    mockMvc.perform(delete(ROOT + "/" + id)).andExpect(status().isNoContent());
+  }
 
-    private Book createNewBook() {
-        return new Book("a book",new HashSet<>());
-    }
-
-
+  private Book createNewBook() {
+    return new Book("a book", new HashSet<>());
+  }
 }
