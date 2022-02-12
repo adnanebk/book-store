@@ -12,4 +12,6 @@ This is a book store rest application developed by using java 17 & spring boot
  
  unit test has been done for services,repositories,controllers
  
+ continuous integration has been inegrated to automate docker build
+ 
 
