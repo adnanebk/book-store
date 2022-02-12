@@ -1,3 +1,5 @@
+
+[![SonarCloud](https://sonarcloud.io/images/project_badges/sonarcloud-white.svg)](https://sonarcloud.io/summary/new_code?id=book_store_spring)
 # book-store
 
 This is a book store rest application developed by using java 17 & spring boot
@@ -11,5 +13,7 @@ This is a book store rest application developed by using java 17 & spring boot
  External libraries used are : H2 Db,Lombok,MapStruct
  
  unit test has been done for services,repositories,controllers
+ 
+ continuous integration has been inegrated to automate docker build
  
 
