@@ -1,5 +1,7 @@
 [![SonarCloud](https://sonarcloud.io/images/project_badges/sonarcloud-white.svg)](https://sonarcloud.io/summary/new_code?id=book_store_spring)
 
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=book_store_spring&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=book_store_spring)
+
 # book-store
 
 This is a book store rest application developed by using java 17 & spring boot
