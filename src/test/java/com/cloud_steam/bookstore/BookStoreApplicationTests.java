@@ -1,62 +1,52 @@
 package com.cloud_steam.bookstore;
 
+import com.cloud_steam.bookstore.dtos.BookDto;
 import com.cloud_steam.bookstore.models.Book;
 import com.cloud_steam.bookstore.models.Comment;
 import com.cloud_steam.bookstore.repositories.CommentRepository;
 import com.cloud_steam.bookstore.services.BookService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.json.JacksonTester;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringBootTest(webEnvironment = WebEnvironment.MOCK)
-@AutoConfigureMockMvc
-@AutoConfigureJsonTesters
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 class BookStoreApplicationTests {
-  @Autowired private MockMvc mockMvc;
+  @Autowired TestRestTemplate testRestTemplate;
   @Autowired private BookService bookService;
-  @Autowired private JacksonTester<Book> jsonBook;
   @Autowired private CommentRepository commentRepository;
-
   private static final String ROOT = "/api/books";
 
   @Test
   void testGetBookComments() throws Exception {
     var book = new Book("programming in java", Set.of(new Comment("a comment")));
     book = bookService.addNew(book);
-    mockMvc
-        .perform(get(ROOT + "/" + book.getId() + "/comments"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$[0].text", is("a comment")));
+    var url = ROOT + "/" + book.getId() + "/comments";
+
+    var response = testRestTemplate.getForEntity(url, Object.class);
+
+    assertTrue(response.getStatusCode().is2xxSuccessful());
+    assertThat(response.getBody()).isNotNull();
   }
 
   @Test
   void testAddBook() throws Exception {
     var book = new Book("a book", new HashSet<>());
-    ;
-    var bookAsJson = jsonBook.write(book).getJson();
-    var response =
-        mockMvc
-            .perform(post(ROOT).contentType(MediaType.APPLICATION_JSON).content(bookAsJson))
-            .andExpect(status().isCreated())
-            .andReturn()
-            .getResponse();
 
-    assertThat(response.getContentAsString()).isEqualTo(bookAsJson);
+    var bookDto = testRestTemplate.postForEntity(ROOT, book, BookDto.class);
+
+    assertTrue(bookDto.getStatusCode().is2xxSuccessful());
+    assertThat(bookDto.getBody()).isNotNull();
+    assertThat(bookDto.getBody().name()).isEqualTo("a book");
   }
 
   @Test
@@ -64,18 +54,14 @@ class BookStoreApplicationTests {
     var book = new Book("a book", null);
     book = bookService.addNew(book);
     book.setName("new name");
-    var bookAsJson = jsonBook.write(book).getJson();
-    var response =
-        mockMvc
-            .perform(
-                put(ROOT + "/" + book.getId())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(bookAsJson))
-            .andExpect(status().isOk())
-            .andReturn()
-            .getResponse();
 
-    assertThat(response.getContentAsString()).isEqualTo(bookAsJson);
+    var response =
+        testRestTemplate.exchange(
+            ROOT + "/" + book.getId(), HttpMethod.PUT, new HttpEntity<>(book), BookDto.class);
+
+    assertTrue(response.getStatusCode().is2xxSuccessful());
+    assertThat(response.getBody()).isNotNull();
+    assertThat(response.getBody().name()).isEqualTo("new name");
   }
 
   @Test
@@ -83,9 +69,12 @@ class BookStoreApplicationTests {
     var book = new Book("a book", Set.of(new Comment("a comment bla bla")));
     book = bookService.addNew(book);
 
-    mockMvc.perform(delete(ROOT + "/" + book.getId())).andExpect(status().isNoContent());
+    var response =
+        testRestTemplate.exchange(ROOT + "/" + book.getId(), HttpMethod.DELETE, null, Void.class);
 
+    assertTrue(response.getStatusCode().is2xxSuccessful());
     // test cascade remove
-    assertThat(commentRepository.findById(book.getComments().stream().findFirst().get().getId())).isEmpty();
+    assertThat(commentRepository.findById(book.getComments().stream().findFirst().get().getId()))
+        .isEmpty();
   }
 }
