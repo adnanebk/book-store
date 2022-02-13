@@ -30,7 +30,6 @@ class BookRepositoryTest {
   @Test
   void saveBook_success() {
     Book book = addNewBook();
-    assertThat(book).isNotNull();
     assertThat(book).hasFieldOrPropertyWithValue("name", "book3");
   }
 
