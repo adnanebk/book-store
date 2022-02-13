@@ -54,7 +54,10 @@ class BookControllerTest {
     when(bookMapper.toEntity(any(BookDto.class))).thenReturn(mock(Book.class));
     when(bookMapper.toDto(any(Book.class))).thenReturn(new BookDto(UUID.randomUUID(),"name",null));
   }
-
+  @Test
+  void testGetBooks() throws Exception {
+    mockMvc.perform(get(ROOT)).andExpect(status().isOk());
+  }
   @Test
   void testGetBookComments() throws Exception {
     UUID id = UUID.randomUUID();
