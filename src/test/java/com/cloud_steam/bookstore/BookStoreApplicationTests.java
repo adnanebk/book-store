@@ -36,8 +36,7 @@ class BookStoreApplicationTests {
 
   @Test
   void testGetBookComments() throws Exception {
-    var comment = commentRepository.save(new Comment("a comment"));
-    var book = new Book("programming in java", Set.of(comment));
+    var book = new Book("programming in java", Set.of(new Comment("a comment")));
     book = bookService.addNew(book);
     mockMvc
         .perform(get(ROOT + "/" + book.getId() + "/comments"))
@@ -62,7 +61,7 @@ class BookStoreApplicationTests {
 
   @Test
   void testUpdateBook() throws Exception {
-    var book = new Book("a book", new HashSet<>());
+    var book = new Book("a book", null);
     book = bookService.addNew(book);
     book.setName("new name");
     var bookAsJson = jsonBook.write(book).getJson();
@@ -81,8 +80,12 @@ class BookStoreApplicationTests {
 
   @Test
   void testDeleteBook_success() throws Exception {
-    var book = new Book("a book", new HashSet<>());
+    var book = new Book("a book", Set.of(new Comment("a comment bla bla")));
     book = bookService.addNew(book);
+
     mockMvc.perform(delete(ROOT + "/" + book.getId())).andExpect(status().isNoContent());
+
+    // test cascade remove
+    assertThat(commentRepository.findById(book.getComments().stream().findFirst().get().getId())).isEmpty();
   }
 }

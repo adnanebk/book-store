@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
@@ -18,7 +19,8 @@ public class Book {
 
   @Id private UUID id = UUID.randomUUID();
   private String name;
-  @OneToMany private Set<Comment> comments;
+  @OneToMany(cascade = CascadeType.ALL)
+  private Set<Comment> comments;
 
   public Book(String name, Set<Comment> comments) {
     this.name = name;
