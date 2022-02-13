@@ -26,18 +26,29 @@ class BookStoreApplicationTests {
   @Autowired private CommentRepository commentRepository;
   private static final String ROOT = "/api/books";
 
+
+  @Test
+  void testGetBooks() throws Exception {
+    var book = new Book("programming in java", Set.of(new Comment("a comment")));
+    bookService.addNew(book);
+
+    var response = testRestTemplate.getForEntity(ROOT, BookDto[].class);
+
+    assertTrue(response.getStatusCode().is2xxSuccessful());
+    assertThat(response.getBody()).isNotEmpty();
+  }
+
   @Test
   void testGetBookComments() throws Exception {
     var book = new Book("programming in java", Set.of(new Comment("a comment")));
     book = bookService.addNew(book);
     var url = ROOT + "/" + book.getId() + "/comments";
 
-    var response = testRestTemplate.getForEntity(url, Object.class);
+    var response = testRestTemplate.getForEntity(url,  BookDto[].class);
 
     assertTrue(response.getStatusCode().is2xxSuccessful());
-    assertThat(response.getBody()).isNotNull();
+    assertThat(response.getBody()).isNotEmpty();
   }
-
   @Test
   void testAddBook() throws Exception {
     var book = new Book("a book", new HashSet<>());
@@ -48,6 +59,7 @@ class BookStoreApplicationTests {
     assertThat(bookDto.getBody()).isNotNull();
     assertThat(bookDto.getBody().name()).isEqualTo("a book");
   }
+
 
   @Test
   void testUpdateBook() throws Exception {
