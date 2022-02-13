@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.util.HashMap;
@@ -44,8 +43,7 @@ public class BookController {
         .map(bookMapper::toEntity)
         .map(bookService::addNew)
         .map(bookMapper::toDto)
-        .orElseThrow(
-            () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "the book is empty"));
+        .orElseThrow();
   }
 
   @PutMapping("/{id}")
@@ -54,8 +52,7 @@ public class BookController {
         .map(bookMapper::toEntity)
         .map(book -> bookService.update(book, id))
         .map(bookMapper::toDto)
-        .orElseThrow(
-            () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "the book is empty"));
+        .orElseThrow();
   }
 
   @DeleteMapping("/{id}")
