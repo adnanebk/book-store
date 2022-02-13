@@ -1,9 +1,9 @@
 package com.cloud_steam.bookstore.controllers;
 
 import com.cloud_steam.bookstore.dtos.BookDto;
+import com.cloud_steam.bookstore.dtos.CommentDto;
 import com.cloud_steam.bookstore.mappers.BookMapper;
-import com.cloud_steam.bookstore.models.Book;
-import com.cloud_steam.bookstore.models.Comment;
+import com.cloud_steam.bookstore.mappers.CommentMapper;
 import com.cloud_steam.bookstore.services.BookService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -13,7 +13,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/api/books")
@@ -21,32 +25,35 @@ import java.util.*;
 public class BookController {
   private final BookService bookService;
   private final BookMapper bookMapper;
+  private final CommentMapper commentMapper;
 
   @GetMapping
-  public Collection<Book> getBooks() {
-    return bookService.getAll();
+  public Stream<BookDto> getBooks() {
+    return bookService.getAll().stream().map(bookMapper::toDto);
   }
 
   @GetMapping("/{id}/comments")
-  public Collection<Comment> getBookComments(@PathVariable("id") UUID id) {
-    return bookService.getBookComments(id);
+  public Stream<CommentDto> getBookComments(@PathVariable("id") UUID id) {
+    return bookService.getBookComments(id).stream().map(commentMapper::toDto);
   }
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  public Book addBook(@RequestBody @Valid Optional<BookDto> bookDto) {
+  public BookDto addBook(@RequestBody @Valid Optional<BookDto> bookDto) {
     return bookDto
         .map(bookMapper::toEntity)
         .map(bookService::addNew)
+        .map(bookMapper::toDto)
         .orElseThrow(
             () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "the book is empty"));
   }
 
   @PutMapping("/{id}")
-  public Book updateBook(@RequestBody @Valid Optional<BookDto> bookDto, @PathVariable("id") UUID id) {
+  public BookDto updateBookBoo0k(@RequestBody @Valid Optional<BookDto> bookDto, @PathVariable("id") UUID id) {
     return bookDto
         .map(bookMapper::toEntity)
         .map(book -> bookService.update(book, id))
+        .map(bookMapper::toDto)
         .orElseThrow(
             () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "the book is empty"));
   }
@@ -62,7 +69,7 @@ public class BookController {
   public Map<String, String> handleValidationExceptions(
           MethodArgumentNotValidException ex) {
     Map<String, String> errors = new HashMap<>();
-    ex.getBindingResult().getAllErrors().forEach((error) -> {
+    ex.getBindingResult().getAllErrors().forEach(error -> {
       String fieldName = ((FieldError) error).getField();
       String errorMessage = error.getDefaultMessage();
       errors.put(fieldName, errorMessage);
