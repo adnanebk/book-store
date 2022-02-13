@@ -71,21 +71,31 @@ class BookControllerTest {
     when(bookService.addNew(any(Book.class))).thenReturn(book);
 
     var bookAsJson = jsonBook.write(book).getJson();
-
         mockMvc
             .perform(post(ROOT).contentType(MediaType.APPLICATION_JSON).content(bookAsJson))
             .andExpect(status().isCreated());
 
 
   }
+  @Test
+  void testAddBook_failed() throws Exception {
+    var book = new Book();
 
+    when(bookService.addNew(any(Book.class))).thenReturn(book);
+
+    var bookAsJson = jsonBook.write(book).getJson();
+    mockMvc
+            .perform(post(ROOT).contentType(MediaType.APPLICATION_JSON).content(bookAsJson))
+            .andExpect(status().isBadRequest());
+  }
   @Test
   void testUpdateBook() throws Exception {
     UUID id = UUID.randomUUID();
     var book = createNewBook();
-    when(bookService.update(any(Book.class), any())).thenReturn(book);
-    var bookAsJson = jsonBook.write(book).getJson();
 
+    when(bookService.update(any(Book.class), any())).thenReturn(book);
+
+    var bookAsJson = jsonBook.write(book).getJson();
         mockMvc
             .perform(
                 put(ROOT + "/" + id, ROOT, id)
